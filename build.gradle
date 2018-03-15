@@ -1,0 +1,62 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
+
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
+	}
+}
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	// spring
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework:spring-context-support")
+    compile("org.springframework:spring-context")
+
+	// database
+    compile("org.springframework:spring-jdbc")
+    compile("commons-dbcp:commons-dbcp")
+    compile("mysql:mysql-connector-java:5.1.31")
+    compile("org.mybatis:mybatis:3.2.7")
+    compile("org.mybatis:mybatis-spring:1.2.2")
+	
+    // jsp, jstl
+    compile("org.apache.tomcat.embed:tomcat-embed-jasper")
+    compile("javax.servlet:jstl")
+    
+    // apache common
+    compile("commons-io:commons-io:2.4")
+    compile("commons-net:commons-net:3.2")
+    compile("org.apache.commons:commons-csv:1.1")
+    compile("org.apache.commons:commons-lang3:3.3.2")
+    compile("org.apache.commons:commons-pool2:2.3") 
+    compile("org.apache.httpcomponents:httpclient:4.4")
+   
+    // google 
+    compile("com.google.guava:guava:18.0")
+    
+    // Aho-Corasic Algorithm (for bad-word)
+    compile("org.ahocorasick:ahocorasick:0.3.0")
+}
+
+jar {
+	manifest {
+		attributes 'Implementation-Title': "unitforum", 'Implementation-Version': "1.0.0", "Main-Class": "ftt.unitforum.FttUnitForumApplication"
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.9'
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ftt.unitforum.dao.unitforum.IUnitforumMasterDao">
+	<resultMap id="forumMasterResultMap" type="ftt.unitforum.types.UnitforumMaster">
+		<id property="masterIdx" column="unitforum_master_idx" />
+		<result property="ssn" column="ssn" />
+		<result property="createDt" column="create_dt" />
+		<result property="desc" column="descr" />
+		<result property="showYn" column="show_yn" />
+		<result property="viewType" column="view_type" />
+		<result property="unitType" column="unit_type" />
+	</resultMap>
+	
+	<select id="getMasterInfo" resultMap="forumMasterResultMap">
+		<![CDATA[
+			SELECT unitforum_master_idx, ssn, create_dt, descr, show_yn, view_type, unit_type
+			FROM unitforum_master
+			where unitforum_master_idx = #{master_idx} AND ssn = #{ssn}
+        ]]>
+	</select>
+</mapper>

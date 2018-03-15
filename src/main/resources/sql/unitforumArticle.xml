@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ftt.unitforum.dao.unitforum.IUnitforumArticleDao">
+	<resultMap id="forumArticleResultMap" type="ftt.unitforum.types.UnitforumArticle">
+		<id property="articleIdx" column="unitforum_article_idx" />
+		<result property="masterIdx" column="unitforum_master_idx" />
+		<result property="worldIdx" column="world_idx" />
+		<result property="class1Code" column="class1_code" />
+		<result property="class2Code" column="class2_code" />
+		<result property="accountIdx" column="account_idx" />
+		<result property="nickname" column="nickname" />
+		<result property="charGrade" column="char_grade" />
+		<result property="content" column="content" />
+		<result property="likeCnt" column="like_cnt" />
+		<result property="createDt" column="create_dt" />
+		<result property="alreadyLike" column="already_like" />
+	</resultMap>
+	
+	<select id="getArticleList" resultMap="forumArticleResultMap">
+        <![CDATA[
+            SELECT 
+            	a.unitforum_article_idx,
+            	a.unitforum_master_idx,
+            	a.world_idx,
+            	a.class1_code,
+            	a.class2_code,
+            	a.account_idx,
+            	a.nickname,
+            	a.char_grade,
+            	a.content,
+            	a.like_cnt,
+            	a.create_dt,
+            	ifnull(h.account_idx, 0) already_like
+            FROM unitforum_article a left join unitforum_like_hist h
+            ON a.unitforum_article_idx = h.unitforum_article_idx AND h.account_idx = #{account_idx}
+            WHERE a.unitforum_master_idx = #{master_idx} AND
+            	  a.lang_code = #{lang_code} AND
+            	  a.world_idx = #{world_idx} AND
+            	  a.class1_code = #{class1_code} AND
+            	  a.class2_code = #{class2_code}
+        ]]>
+          	<choose>
+            	<when test="sort_order == 1">
+            		ORDER BY a.create_dt DESC 
+            	</when>
+            	<otherwise>
+            		ORDER BY a.like_cnt DESC, a.create_dt DESC 
+            	</otherwise>
+            </choose>
+        <![CDATA[
+        	limit #{limit_start}, #{limit_count} 
+        ]]>
+	</select>
+	
+	<select id="getArticle" resultMap="forumArticleResultMap">
+        <![CDATA[
+            SELECT 
+            	unitforum_article_idx,
+            	unitforum_master_idx,
+            	world_idx,
+            	class1_code,
+            	class2_code,
+            	account_idx,
+            	nickname,
+            	char_grade,
+            	content,
+            	like_cnt,
+            	create_dt
+            FROM unitforum_article
+            WHERE unitforum_article_idx = #{article_idx} AND
+            	  unitforum_master_idx = #{master_idx}
+        ]]>
+	</select>
+	
+	<insert id="insertArticle">
+        <![CDATA[
+        	INSERT INTO unitforum_article (unitforum_master_idx, lang_code, world_idx, class1_code, class2_code, 
+        									account_idx, nickname, char_grade, content, like_cnt, create_dt)
+        	VALUES(#{master_idx}, #{lang_code}, #{world_idx}, #{class1_code}, #{class2_code},
+        			#{account_idx}, #{nickname}, #{char_grade}, #{content}, #{like_cnt}, #{create_dt})
+        ]]>
+	</insert>
+	
+	<delete id="deleteArticle">
+        <![CDATA[
+        	DELETE FROM unitforum_article 
+        	WHERE unitforum_article_idx = #{article_idx} AND unitforum_master_idx = #{master_idx} AND account_idx = #{account_idx}
+        	LIMIT 1
+        ]]>
+	</delete>
+	
+	<resultMap id="forumLikeHistoryResultMap" type="ftt.unitforum.types.UnitforumLikeHistory">
+		<id property="historyIdx" column="unitforum_like_hist_idx" />
+		<result property="articleIdx" column="unitforum_article_idx" />
+		<result property="accountIdx" column="account_idx" />
+		<result property="createDt" column="create_dt" />
+	</resultMap>
+	
+ 	<select id="getLikeHistory" resultMap="forumLikeHistoryResultMap">
+        <![CDATA[
+            SELECT unitforum_like_hist_idx, unitforum_article_idx, account_idx, create_dt
+            FROM unitforum_like_hist
+            WHERE unitforum_article_idx = #{article_idx} AND
+            	  account_idx = #{account_idx}
+            LIMIT 1
+        ]]>
+	</select>
+	
+	<insert id="insertLikeHistory">
+        <![CDATA[
+        	INSERT into unitforum_like_hist (unitforum_article_idx, account_idx, create_dt)
+        	VALUES(#{article_idx}, #{account_idx}, #{create_dt})
+        ]]>
+	</insert>
+	
+	<delete id="deleteLikeHistory">
+        <![CDATA[
+        	DELETE FROM unitforum_like_hist 
+        	WHERE account_idx = #{account_idx} AND unitforum_article_idx = #{article_idx} 
+        	LIMIT 1
+        ]]>
+	</delete>
+	
+	<update id="increaseLikeCount">
+        <![CDATA[
+        	UPDATE unitforum_article
+        	SET  like_cnt = like_cnt + 1
+        	WHERE unitforum_article_idx = #{article_idx} AND unitforum_master_idx = #{master_idx} 
+        ]]>
+	</update>
+	
+	<update id="decreaseLikeCount">
+        <![CDATA[
+        	UPDATE unitforum_article
+        	SET  like_cnt = like_cnt - 1
+        	WHERE unitforum_article_idx = #{article_idx} AND unitforum_master_idx = #{master_idx} AND like_cnt > 0 
+        ]]>
+	</update>
+	
+</mapper>
